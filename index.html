@@ -1,12 +1,65 @@
 <!doctype html>
 <html lang="en">
   <head>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/supabase.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>AR Rahman - Experience the Qur'an Like Never Before</title>
     <meta name="description" content="Be among the first to access an Augmented Reality tool that brings the meaning of the Qur'an to life during your prayer." />
   </head>
+  <form id="contact-form">
+  <input type="text" name="name" placeholder="Your Name" required /><br />
+  <input type="email" name="email" placeholder="Your Email" required /><br />
+  <textarea name="message" placeholder="Your Message" required></textarea><br />
+  <button type="submit">Send</button>
+</form>
+  <script>
+  // Initialize EmailJS
+  emailjs.init('ye3twwVcfp0jM_o2z'); // your EmailJS user ID
+
+  // Initialize Supabase client
+  const supabaseUrl = 'https://fpbmojzmwcwwrjrxeib.supabase.co'; // your Supabase URL
+  const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZwYm1vemptd2N3d3JnanJ4ZWliIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTEzMDk2MzQsImV4cCI6MjA2Njg4NTYzNH0.WCNW3F5xDfZ-BD_pU4JoPJGc4jkRtwhgFkxdpTzre-c'; // your anon key
+
+  const supabase = supabase.createClient(supabaseUrl, supabaseAnonKey);
+
+  // Handle form submission
+  const form = document.getElementById('contact-form');
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const name = form.name.value;
+    const email = form.email.value;
+    const message = form.message.value;
+    const created_at = new Date().toISOString();
+
+    // Save data to Supabase
+    const { error } = await supabase
+      .from('contacts')
+      .insert([{ name, email, message, created_at }]);
+
+    if (error) {
+      alert('Error saving data: ' + error.message);
+      return;
+    }
+
+    // Send email with EmailJS
+    emailjs.send('service_xjizkqm', 'template_4alhysb', {
+      from_name: name,
+      from_email: email,
+      message: message,
+    })
+    .then(() => {
+      alert('Message sent and data saved successfully!');
+      form.reset();
+    })
+    .catch((err) => {
+      alert('Failed to send email: ' + err.text);
+    });
+  });
+</script>
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
