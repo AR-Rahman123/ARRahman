@@ -23,7 +23,7 @@
   const supabaseUrl = 'https://fpbmojzmwcwwrjrxeib.supabase.co'; // your Supabase URL
   const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZwYm1vemptd2N3d3JnanJ4ZWliIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTEzMDk2MzQsImV4cCI6MjA2Njg4NTYzNH0.WCNW3F5xDfZ-BD_pU4JoPJGc4jkRtwhgFkxdpTzre-c'; // your anon key
 
-  const supabase = supabase.createClient(supabaseUrl, supabaseAnonKey);
+  const supabase = Supabase.createClient(supabaseUrl, supabaseAnonKey);
 
   // Handle form submission
   const form = document.getElementById('contact-form');
