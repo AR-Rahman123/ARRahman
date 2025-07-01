@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { X, Mail, User, Briefcase, CheckCircle, ChevronRight, ChevronLeft } from 'lucide-react';
-import { sendWaitlistNotification, sendConfirmationEmail, WaitlistData } from '../utils/emailService';]
+import { sendWaitlistNotification, sendConfirmationEmail, WaitlistData } from '../utils/emailService';
 import { createClient } from '@supabase/supabase-js';
 const supabaseUrl = 'https://fpbmozjmwcwwrgjrxeib.supabase.co';
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZwYm1vemptd2N3d3JnanJ4ZWliIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTEzMDk2MzQsImV4cCI6MjA2Njg4NTYzNH0.WCNW3F5xDfZ-BD_pU4JoPJGc4jkRtwhgFkxdpTzre-c';
