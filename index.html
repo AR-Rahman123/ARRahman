@@ -10,34 +10,5 @@
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/supabase.min.js"></script>
-<script>
-  // 🔑 Your Supabase keys
-  const supabaseUrl = "https://fpbmozjmwcwwrgjrxeib.supabase.co";
-  const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZwYm1vemptd2N3d3JnanJ4ZWliIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTEzMDk2MzQsImV4cCI6MjA2Njg4NTYzNH0.WCNW3F5xDfZ-BD_pU4JoPJGc4jkRtwhgFkxdpTzre-c";
-  const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
-
-  // 💬 Waitlist form logic
-  const form = document.getElementById('waitlist-form');
-  if (form) {
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
-
-      const name = form.name.value;
-      const email = form.email.value;
-
-      const { error } = await supabaseClient
-        .from('waitlist')
-        .insert([{ name: name, email: email }]);
-
-      if (error) {
-        alert('❌ Error saving: ' + error.message);
-      } else {
-        alert('✅ Successfully joined the waitlist!');
-        form.reset();
-      }
-    });
-  }
-</script>
   </body>
 </html>
