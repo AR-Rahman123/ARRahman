@@ -171,6 +171,7 @@ export const WaitlistForm: React.FC<WaitlistFormProps> = ({ isOpen, onClose }) =
     .insert([{
       name: formData.name,
       email: formData.email,
+      message: formData.message,
       profession: formData.profession,
       // add more fields here if you want to store them
     }]);
