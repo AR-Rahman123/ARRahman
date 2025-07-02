@@ -1,11 +1,57 @@
-import { Client } from 'pg';
+const { Client } = require('pg');
 
-export async function handler(event, context) {
-  if (event.httpMethod !== 'POST') {
-    return { statusCode: 405, body: 'Method Not Allowed' };
+exports.handler = async (event, context) => {
+  // Add CORS headers
+  const headers = {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Headers': 'Content-Type',
+    'Access-Control-Allow-Methods': 'POST, OPTIONS'
+  };
+
+  // Handle preflight requests
+  if (event.httpMethod === 'OPTIONS') {
+    return {
+      statusCode: 200,
+      headers,
+      body: ''
+    };
   }
 
-  const data = JSON.parse(event.body);
+  if (event.httpMethod !== 'POST') {
+    return { 
+      statusCode: 405, 
+      headers,
+      body: JSON.stringify({ error: 'Method Not Allowed' })
+    };
+  }
+
+  let data;
+  try {
+    data = JSON.parse(event.body);
+  } catch (parseError) {
+    return {
+      statusCode: 400,
+      headers,
+      body: JSON.stringify({ error: 'Invalid JSON', details: parseError.message })
+    };
+  }
+
+  // Validate required fields
+  if (!data.name || !data.email) {
+    return {
+      statusCode: 400,
+      headers,
+      body: JSON.stringify({ error: 'Name and email are required' })
+    };
+  }
+
+  if (!process.env.DATABASE_URL) {
+    return {
+      statusCode: 500,
+      headers,
+      body: JSON.stringify({ error: 'Database configuration missing' })
+    };
+  }
 
   const client = new Client({
     connectionString: process.env.DATABASE_URL,
@@ -14,6 +60,7 @@ export async function handler(event, context) {
 
   try {
     await client.connect();
+    console.log('Connected to database successfully');
 
     // Create table if it doesn't exist
     await client.query(`
@@ -40,82 +87,81 @@ export async function handler(event, context) {
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )
     `);
+    console.log('Table ensured');
 
     // Insert the data
-    await client.query(
+    const insertResult = await client.query(
       `INSERT INTO waitlist
       (name, email, profession, age, prayer_frequency, arabic_understanding, difficulty_understanding,
        importance_of_understanding, biggest_struggle, ar_interest, valuable_features, barriers,
        payment_willingness, budget_range, likelihood, additional_feedback, interview_willingness,
        investor_presentation_interest)
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18)`,
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18)
+      RETURNING id, created_at`,
       [
         data.name,
         data.email,
-        data.profession,
-        data.age,
-        data.prayerFrequency,
-        data.arabicUnderstanding,
-        data.difficultyUnderstanding,
-        data.importanceOfUnderstanding,
-        data.biggestStruggle,
-        data.arInterest,
-        data.valuableFeatures, // array
-        data.barriers,         // array
-        data.paymentWillingness,
-        data.budgetRange,
-        data.likelihood,
-        data.additionalFeedback,
-        data.interviewWillingness,
-        data.investorPresentationInterest
+        data.profession || '',
+        data.age || '',
+        data.prayerFrequency || '',
+        data.arabicUnderstanding || '',
+        data.difficultyUnderstanding || '',
+        data.importanceOfUnderstanding || '',
+        data.biggestStruggle || '',
+        data.arInterest || '',
+        Array.isArray(data.valuableFeatures) ? data.valuableFeatures : [],
+        Array.isArray(data.barriers) ? data.barriers : [],
+        data.paymentWillingness || '',
+        data.budgetRange || '',
+        data.likelihood || '',
+        data.additionalFeedback || '',
+        data.interviewWillingness || '',
+        data.investorPresentationInterest || ''
       ]
     );
-async function submitWaitlist(e) {
-  e.preventDefault();
-
-  const formData = {
-    name: document.getElementById('name').value,
-    email: document.getElementById('email').value,
-    profession: document.getElementById('profession').value,
-    age: document.getElementById('age').value,
-    prayerFrequency: document.getElementById('prayerFrequency').value,
-    arabicUnderstanding: document.getElementById('arabicUnderstanding').value,
-    difficultyUnderstanding: document.getElementById('difficultyUnderstanding').value,
-    importanceOfUnderstanding: document.getElementById('importanceOfUnderstanding').value,
-    biggestStruggle: document.getElementById('biggestStruggle').value,
-    arInterest: document.getElementById('arInterest').value,
-    valuableFeatures: Array.from(document.querySelectorAll('input[name="valuableFeatures"]:checked')).map(el => el.value),
-    barriers: Array.from(document.querySelectorAll('input[name="barriers"]:checked')).map(el => el.value),
-    paymentWillingness: document.getElementById('paymentWillingness').value,
-    budgetRange: document.getElementById('budgetRange').value,
-    likelihood: document.getElementById('likelihood').value,
-    additionalFeedback: document.getElementById('additionalFeedback').value,
-    interviewWillingness: document.getElementById('interviewWillingness').value,
-    investorPresentationInterest: document.getElementById('investorPresentationInterest').value
-  };
-
-  const response = await fetch("https://www.ar-rahman.ai/.netlify/functions/db-test", {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(formData)
-  });
-
-  const result = await response.json();
-  console.log(result);
-}
 
     await client.end();
+    console.log('Data inserted successfully:', insertResult.rows[0]);
 
     return {
       statusCode: 200,
-      headers: { 'Access-Control-Allow-Origin': '*' },
-      body: JSON.stringify({ success: true }),
+      headers,
+      body: JSON.stringify({ 
+        success: true, 
+        data: insertResult.rows[0],
+        message: 'Successfully saved to database'
+      }),
     };
   } catch (error) {
+    console.error('Database error:', error);
+    
+    try {
+      await client.end();
+    } catch (endError) {
+      console.error('Error closing connection:', endError);
+    }
+
+    // Handle specific database errors
+    if (error.code === '23505') { // Unique constraint violation
+      return {
+        statusCode: 409,
+        headers,
+        body: JSON.stringify({ 
+          error: 'Duplicate entry', 
+          details: 'This email is already registered',
+          code: 'DUPLICATE_EMAIL' 
+        }),
+      };
+    }
+
     return {
       statusCode: 500,
-      headers: { 'Access-Control-Allow-Origin': '*' },
-      body: JSON.stringify({ error: 'Database error', details: error.message }),
+      headers,
+      body: JSON.stringify({ 
+        error: 'Database error', 
+        details: error.message,
+        code: error.code 
+      }),
     };
   }
-}
+};

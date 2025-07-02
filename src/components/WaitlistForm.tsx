@@ -276,7 +276,10 @@ export const WaitlistForm: React.FC<WaitlistFormProps> = ({ isOpen, onClose }) =
         return { success: true, data: result };
       } else {
         const error = await response.json();
-        return { success: false, error: error.details || 'Database save failed' };
+        if (response.status === 409 && error.code === 'DUPLICATE_EMAIL') {
+          return { success: false, error: error.details, code: 'DUPLICATE_EMAIL' };
+        }
+        return { success: false, error: error.details || error.error || 'Database save failed' };
       }
     } catch (error) {
       console.error('Error saving to database:', error);
@@ -294,8 +297,15 @@ export const WaitlistForm: React.FC<WaitlistFormProps> = ({ isOpen, onClose }) =
       
       if (!dbResult.success) {
         console.error('Database save failed:', dbResult.error);
-        // Continue with email even if database fails
-        console.warn('Database save failed but continuing with email...');
+        if (dbResult.code === 'DUPLICATE_EMAIL') {
+          setEmailStatus('error');
+          alert('❌ This email is already on our waitlist!');
+          setIsSubmitting(false);
+          return;
+        } else {
+          // Continue with email even if database fails
+          console.warn('Database save failed but continuing with email...');
+        }
       } else {
         console.log('✅ Successfully saved to Neon database:', dbResult.data);
       }
