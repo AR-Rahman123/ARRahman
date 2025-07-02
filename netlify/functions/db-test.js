@@ -67,7 +67,7 @@ async function submitWaitlist(e) {
     investorPresentationInterest: document.getElementById('investorPresentationInterest').value
   };
 
-  const response = await fetch('https://your-netlify-site.netlify.app/.netlify/functions/db-test', {
+  const response = await fetch("https://www.ar-rahman.ai/.netlify/functions/db-test", {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(formData)
