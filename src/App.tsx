@@ -6,6 +6,8 @@ import { PresenceInSalah } from './components/PresenceInSalah';
 import { JoinInnerCircle } from './components/JoinInnerCircle';
 import { WaitlistForm } from './components/WaitlistForm';
 import { ComingSoon } from './pages/ComingSoon';
+// Import test utility for development
+import './utils/emailTest';
 
 function LandingPage() {
   const [isWaitlistOpen, setIsWaitlistOpen] = useState(false);
