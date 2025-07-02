@@ -178,3 +178,62 @@ Your system already includes:
 4. Consider adding email automation for follow-ups
 
 Your waitlist system is professionally built and ready to go! 🚀
+
+---
+
+## Troubleshooting Email Delivery Issues
+
+### If Console Shows Success But No Email Received
+
+**Step 1: Check Your Email 📧**
+1. **Spam/Junk folder** - This is the most common issue!
+2. **Promotions tab** (Gmail)
+3. **Updates tab** (Gmail)
+4. **All Mail** folder
+
+**Step 2: Use Debug Tools**
+Restart your dev server and open browser console:
+```bash
+npm run dev
+```
+
+Run these debug commands:
+```javascript
+// Check configuration
+emailDebug.config()
+
+// Run full diagnostic  
+emailDebug.full('your-email@gmail.com')
+
+// Test simple email
+emailDebug.simple('your-email@gmail.com')
+
+// Check template setup
+emailDebug.template()
+```
+
+**Step 3: Common Issues & Fixes**
+
+1. **Template ID is placeholder**
+   - Warning: "Still using placeholder template ID"
+   - Fix: Replace `template_confirmation_id` with actual EmailJS template ID
+
+2. **Template variables not mapped**
+   - Error: "400" or "bad request"
+   - Fix: Ensure EmailJS template "To" field is exactly `{{to_email}}`
+
+3. **Emails going to spam**
+   - Console shows success but no email
+   - Fix: Check spam folder, add sender to contacts
+
+4. **EmailJS account limits**
+   - Free accounts: 200 emails/month
+   - Check usage: https://dashboard.emailjs.com/admin
+
+**Step 4: Quick Template Test**
+Create simple template in EmailJS:
+- **To:** `{{to_email}}`
+- **Subject:** `Test from AR Rahman`
+- **Body:** `Hello {{user_name}}, this is a test email.`
+
+Test: `emailDebug.simple('your-email@gmail.com')`

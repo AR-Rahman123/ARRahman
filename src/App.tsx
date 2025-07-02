@@ -8,6 +8,7 @@ import { WaitlistForm } from './components/WaitlistForm';
 import { ComingSoon } from './pages/ComingSoon';
 // Import test utility for development
 import './utils/emailTest';
+import './utils/emailDebug';
 
 function LandingPage() {
   const [isWaitlistOpen, setIsWaitlistOpen] = useState(false);
