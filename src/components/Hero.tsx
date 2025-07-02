@@ -90,7 +90,7 @@ export const Hero: React.FC<HeroProps> = ({ onJoinWaitlist }) => {
                 <div className="relative aspect-video bg-black rounded-xl overflow-hidden">
                   <iframe
                     className="w-full h-full rounded-xl"
-                    src="https://www.youtube.com/embed/0Op1fsPiCpk"
+                    src="https://www.youtube.com/embed/f1pqhZO3Lik"
                     title="AR Rahman Demo - Experience the Qur'an Like Never Before"
                     frameBorder="0"
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
