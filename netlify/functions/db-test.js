@@ -48,7 +48,7 @@ export async function handler(event, context) {
        importance_of_understanding, biggest_struggle, ar_interest, valuable_features, barriers,
        payment_willingness, budget_range, likelihood, additional_feedback, interview_willingness,
        investor_presentation_interest)
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18)`,
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19)`,
       [
         data.name,
         data.email,
