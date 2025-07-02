@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { X, Mail, User, Briefcase, CheckCircle, ChevronRight, ChevronLeft } from 'lucide-react';
 import { sendWaitlistNotification, sendConfirmationEmail, WaitlistData } from '../utils/emailService';
 
-
 interface WaitlistFormProps {
   isOpen: boolean;
   onClose: () => void;
@@ -21,7 +20,6 @@ interface FormData {
   arInterest: string;
   valuableFeatures: string[];
   barriers: string[];
-  paymentWillingness: string;
   budgetRange: string;
   likelihood: string;
   additionalFeedback: string;
@@ -112,12 +110,6 @@ const questions = [
     ]
   },
   {
-    id: 'paymentWillingness',
-    title: 'Would you pay for this kind of AR headset if it genuinely helped your connection to the Quran?',
-    type: 'radio',
-    options: ['Definitely yes', 'Probably yes', 'Maybe', 'Probably no', 'Definitely no']
-  },
-  {
     id: 'budgetRange',
     title: 'When it comes to your budget for an Augmented Reality Qur\'an service, which price do you have in mind?',
     type: 'radio',
@@ -167,7 +159,6 @@ export const WaitlistForm: React.FC<WaitlistFormProps> = ({ isOpen, onClose }) =
     arInterest: '',
     valuableFeatures: [],
     barriers: [],
-    paymentWillingness: '',
     budgetRange: '',
     likelihood: '',
     additionalFeedback: '',
@@ -262,7 +253,6 @@ export const WaitlistForm: React.FC<WaitlistFormProps> = ({ isOpen, onClose }) =
           arInterest: data.arInterest,
           valuableFeatures: data.valuableFeatures,
           barriers: data.barriers,
-          paymentWillingness: data.paymentWillingness,
           budgetRange: data.budgetRange,
           likelihood: data.likelihood,
           additionalFeedback: data.additionalFeedback,
@@ -314,7 +304,6 @@ export const WaitlistForm: React.FC<WaitlistFormProps> = ({ isOpen, onClose }) =
         arInterest: formData.arInterest,
         valuableFeatures: formData.valuableFeatures,
         barriers: formData.barriers,
-        paymentWillingness: formData.paymentWillingness,
         budgetRange: formData.budgetRange,
         likelihood: formData.likelihood,
         additionalFeedback: formData.additionalFeedback,
@@ -372,7 +361,7 @@ export const WaitlistForm: React.FC<WaitlistFormProps> = ({ isOpen, onClose }) =
       name: '', email: '', profession: '', age: '', prayerFrequency: '',
       arabicUnderstanding: '', difficultyUnderstanding: '', importanceOfUnderstanding: '',
       biggestStruggle: '', arInterest: '', valuableFeatures: [], barriers: [],
-      paymentWillingness: '', budgetRange: '', likelihood: '', additionalFeedback: '',
+      budgetRange: '', likelihood: '', additionalFeedback: '',
       interviewWillingness: '', investorPresentationInterest: ''
     });
     setCurrentStep(1);

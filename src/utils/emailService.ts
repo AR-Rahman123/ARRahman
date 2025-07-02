@@ -20,7 +20,6 @@ export interface WaitlistData {
   arInterest: string;
   valuableFeatures: string[];
   barriers: string[];
-  paymentWillingness: string;
   budgetRange: string;
   likelihood: string;
   additionalFeedback: string;
@@ -47,7 +46,6 @@ export const sendWaitlistNotification = async (data: WaitlistData): Promise<bool
       ar_interest: data.arInterest,
       valuable_features: data.valuableFeatures.join(', '),
       barriers: data.barriers.join(', '),
-      payment_willingness: data.paymentWillingness,
       budget_range: data.budgetRange,
       likelihood: data.likelihood,
       additional_feedback: data.additionalFeedback,
