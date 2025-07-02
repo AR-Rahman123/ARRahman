@@ -4,6 +4,7 @@ import emailjs from '@emailjs/browser';
 const EMAILJS_CONFIG = {
   serviceId: "service_xjizkqm", // Replace with your EmailJS service ID
   templateId: "template_4alhysb", // Replace with your EmailJS template ID
+  confirmationTemplateId: "template_confirmation_id", // Replace with your confirmation template ID
   publicKey: "ye3twwVcfp0jM_o2z", // Replace with your EmailJS public key
 };
 
@@ -75,32 +76,50 @@ export const sendConfirmationEmail = async (userEmail: string, userName: string)
     const templateParams = {
       to_email: userEmail,
       from_name: 'AR Rahman Team',
-      subject: 'Welcome to AR Rahman Waitlist!',
+      subject: 'Welcome to AR Rahman Waitlist - Your Journey Begins! 🕌',
       user_name: userName,
-      message: `
-        Assalamu Alaikum ${userName},
+      greeting: `Assalamu Alaikum ${userName}`,
+      main_message: `Thank you for joining the AR Rahman waitlist! We're honored to have you on this revolutionary journey to deepen our connection with the Quran through augmented reality.`,
+      what_happens_next: `What happens next:
+• You'll receive exclusive updates as we develop the product
+• You'll get priority access when we launch
+• We may reach out for feedback during development
+• Access to special beta testing opportunities`,
+      additional_info: `Our mission is to help Muslims around the world understand and connect with the Quran like never before. Your participation in this journey means everything to us.`,
+      closing: `Stay tuned for exciting updates, and may Allah bless this endeavor.`,
+      signature: `Barakallahu feeki,
+The AR Rahman Team`,
+      company_info: `AR Rahman - Bringing the Quran to life through technology`,
+      // For simpler templates, also include a combined message
+      full_message: `Assalamu Alaikum ${userName},
 
-        Thank you for joining the AR Rahman waitlist! We're excited to have you on this revolutionary journey.
+Thank you for joining the AR Rahman waitlist! We're honored to have you on this revolutionary journey to deepen our connection with the Quran through augmented reality.
 
-        What happens next:
-        • You'll receive exclusive updates as we develop the product
-        • You'll get priority access when we launch
-        • We may reach out for feedback during development
+What happens next:
+• You'll receive exclusive updates as we develop the product
+• You'll get priority access when we launch
+• We may reach out for feedback during development
+• Access to special beta testing opportunities
 
-        Stay tuned for more updates!
+Our mission is to help Muslims around the world understand and connect with the Quran like never before. Your participation in this journey means everything to us.
 
-        Barakallahu feeki,
-        The AR Rahman Team
-      `
+Stay tuned for exciting updates, and may Allah bless this endeavor.
+
+Barakallahu feeki,
+The AR Rahman Team
+
+---
+AR Rahman - Bringing the Quran to life through technology`
     };
 
     await emailjs.send(
       EMAILJS_CONFIG.serviceId,
-      'YOUR_CONFIRMATION_TEMPLATE_ID', // You'll need a separate template for confirmations
+      EMAILJS_CONFIG.confirmationTemplateId,
       templateParams,
       EMAILJS_CONFIG.publicKey
     );
 
+    console.log('Confirmation email sent successfully to:', userEmail);
     return true;
   } catch (error) {
     console.error('Failed to send confirmation email:', error);
