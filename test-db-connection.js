@@ -2,7 +2,104 @@
 // Run this with: node test-db-connection.js
 
 import { sql } from '@vercel/postgres';
-import { initializeWaitlistTable, saveWaitlistEntry } from './src/utils/database.js';
+import dotenv from 'dotenv';
+
+// Load environment variables
+dotenv.config();
+
+// Database functions (copied from database.ts for testing)
+async function initializeWaitlistTable() {
+  try {
+    await sql`
+      CREATE TABLE IF NOT EXISTS waitlist (
+        id SERIAL PRIMARY KEY,
+        name VARCHAR(255) NOT NULL,
+        email VARCHAR(255) NOT NULL UNIQUE,
+        profession VARCHAR(255),
+        age VARCHAR(50),
+        prayer_frequency VARCHAR(100),
+        arabic_understanding VARCHAR(100),
+        difficulty_understanding VARCHAR(100),
+        importance_of_understanding VARCHAR(100),
+        biggest_struggle VARCHAR(255),
+        ar_interest VARCHAR(100),
+        valuable_features TEXT[],
+        barriers TEXT[],
+        payment_willingness VARCHAR(100),
+        budget_range VARCHAR(100),
+        likelihood VARCHAR(100),
+        additional_feedback TEXT,
+        interview_willingness VARCHAR(100),
+        investor_presentation_interest VARCHAR(100),
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `;
+    console.log('Waitlist table initialized successfully');
+    return { success: true };
+  } catch (error) {
+    console.error('Error initializing waitlist table:', error);
+    return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
+  }
+}
+
+async function saveWaitlistEntry(data) {
+  try {
+    await initializeWaitlistTable();
+
+    const result = await sql`
+      INSERT INTO waitlist (
+        name, email, profession, age, prayer_frequency,
+        arabic_understanding, difficulty_understanding, importance_of_understanding,
+        biggest_struggle, ar_interest, valuable_features, barriers,
+        payment_willingness, budget_range, likelihood, additional_feedback,
+        interview_willingness, investor_presentation_interest
+      ) VALUES (
+        ${data.name},
+        ${data.email},
+        ${data.profession},
+        ${data.age},
+        ${data.prayer_frequency},
+        ${data.arabic_understanding},
+        ${data.difficulty_understanding},
+        ${data.importance_of_understanding},
+        ${data.biggest_struggle},
+        ${data.ar_interest},
+        ${JSON.stringify(data.valuable_features)},
+        ${JSON.stringify(data.barriers)},
+        ${data.payment_willingness},
+        ${data.budget_range},
+        ${data.likelihood},
+        ${data.additional_feedback},
+        ${data.interview_willingness},
+        ${data.investor_presentation_interest}
+      )
+      RETURNING id, created_at
+    `;
+
+    console.log('Waitlist entry saved successfully:', result.rows[0]);
+    return { 
+      success: true, 
+      data: result.rows[0],
+      message: 'Successfully saved to database'
+    };
+  } catch (error) {
+    console.error('Error saving waitlist entry:', error);
+    
+    if (error && typeof error === 'object' && 'code' in error && error.code === '23505') {
+      return { 
+        success: false, 
+        error: 'Email already exists in our waitlist',
+        code: 'DUPLICATE_EMAIL'
+      };
+    }
+    
+    return { 
+      success: false, 
+      error: error instanceof Error ? error.message : 'Failed to save to database',
+      code: 'DATABASE_ERROR'
+    };
+  }
+}
 
 async function testConnection() {
   console.log('🔄 Testing Neon database connection...');
