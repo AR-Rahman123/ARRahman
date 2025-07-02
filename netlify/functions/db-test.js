@@ -8,7 +8,7 @@ export async function handler(event, context) {
   const data = JSON.parse(event.body);
 
   const client = new Client({
-    connectionString: process.env.POSTGRES_URL,
+    connectionString: process.env.DATABASE_URL,
     ssl: { rejectUnauthorized: false },
   });
 

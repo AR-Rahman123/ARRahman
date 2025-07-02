@@ -32,7 +32,7 @@ Since you're using Netlify, you need to set the environment variable in your **N
    - Click **"Add a variable"**
 
 3. **Add your Neon connection string**
-   - **Key:** `POSTGRES_URL`
+   - **Key:** `DATABASE_URL`
    - **Value:** Your Neon connection string (get from [console.neon.tech](https://console.neon.tech))
    - **Example:** `postgresql://username:password@ep-xxx-pooler.us-east-1.aws.neon.tech/dbname?sslmode=require`
    - ⚠️ **Important:** Use the **POOLED** connection string (contains `-pooler`)
@@ -90,7 +90,7 @@ Every form submission will save **ALL 18 fields**:
 ### **If the form doesn't save data:**
 
 1. **Check Netlify Environment Variables**
-   - Make sure `POSTGRES_URL` is set correctly
+   - Make sure `DATABASE_URL` is set correctly
    - Use the **pooled** connection string (with `-pooler`)
 
 2. **Check Netlify Function Logs**
@@ -119,7 +119,7 @@ Every form submission will save **ALL 18 fields**:
 
 ## 🎯 **Next Steps**
 
-1. **Set `POSTGRES_URL` in Netlify dashboard**
+1. **Set `DATABASE_URL` in Netlify dashboard**
 2. **Deploy the changes** (git push)
 3. **Test the form** on your live site
 4. **Verify data in Neon console**
