@@ -1,13 +1,159 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Vite + React + TS</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Data Display</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .container {
+            background: white;
+            padding: 3rem;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            min-width: 400px;
+        }
+        
+        h1 {
+            color: #333;
+            margin: 0 0 1rem 0;
+            font-size: 2.5rem;
+            font-weight: 300;
+        }
+        
+        .loading {
+            color: #667eea;
+            font-size: 1.2rem;
+            margin: 1rem 0;
+        }
+        
+        .error {
+            color: #e74c3c;
+            background: #ffeaea;
+            padding: 1rem;
+            border-radius: 8px;
+            border-left: 4px solid #e74c3c;
+            margin: 1rem 0;
+        }
+        
+        .success {
+            color: #27ae60;
+            font-size: 0.9rem;
+            margin-top: 1rem;
+        }
+        
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 1rem auto;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .api-info {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-top: 2rem;
+            font-size: 0.9rem;
+            color: #666;
+        }
+        
+        .retry-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            margin-top: 1rem;
+            transition: background 0.3s ease;
+        }
+        
+        .retry-btn:hover {
+            background: #5a6fd8;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 id="timeDisplay">Loading...</h1>
+        <div id="loadingSpinner" class="spinner"></div>
+        <div id="statusMessage" class="loading">Fetching database time...</div>
+        <button id="retryBtn" class="retry-btn" style="display: none;" onclick="getDatabaseTime()">Retry</button>
+        
+        <div class="api-info">
+            <strong>Database Connection:</strong><br>
+            Connecting to Neon database via Netlify function
+        </div>
+    </div>
+
+    <script>
+        // Replace this with your actual Netlify function URL
+        const NETLIFY_FUNCTION_URL = 'https://your-netlify-site.netlify.app/.netlify/functions/db-test';
+
+        async function getDatabaseTime() {
+            const timeDisplay = document.getElementById('timeDisplay');
+            const statusMessage = document.getElementById('statusMessage');
+            const loadingSpinner = document.getElementById('loadingSpinner');
+            const retryBtn = document.getElementById('retryBtn');
+            
+            // Show loading state
+            timeDisplay.textContent = 'Loading...';
+            statusMessage.textContent = 'Fetching database time...';
+            statusMessage.className = 'loading';
+            loadingSpinner.style.display = 'block';
+            retryBtn.style.display = 'none';
+            
+            try {
+                const response = await fetch(NETLIFY_FUNCTION_URL);
+                if (!response.ok) throw new Error('Network response was not ok');
+
+                const data = await response.json();
+                console.log('Database time:', data.time);
+
+                timeDisplay.textContent = `Database time: ${data.time}`;
+                statusMessage.textContent = 'Successfully connected to database!';
+                statusMessage.className = 'success';
+                loadingSpinner.style.display = 'none';
+                
+            } catch (error) {
+                console.error('Error fetching data:', error);
+                
+                timeDisplay.textContent = 'Error fetching data';
+                statusMessage.innerHTML = `
+                    <strong>Failed to connect to database:</strong><br>
+                    ${error.message}
+                `;
+                statusMessage.className = 'error';
+                retryBtn.style.display = 'inline-block';
+                loadingSpinner.style.display = 'none';
+            }
+        }
+
+        // Call the function when page loads
+        document.addEventListener('DOMContentLoaded', getDatabaseTime);
+    </script>
+</body>
 </html>
