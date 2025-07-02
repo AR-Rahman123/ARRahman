@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { X, Mail, User, Briefcase, CheckCircle, ChevronRight, ChevronLeft } from 'lucide-react';
 import { sendWaitlistNotification, sendConfirmationEmail, WaitlistData } from '../utils/emailService';
-import { saveWaitlistEntry, WaitlistEntry } from '../utils/database';
 
 
 interface WaitlistFormProps {
@@ -243,47 +242,60 @@ export const WaitlistForm: React.FC<WaitlistFormProps> = ({ isOpen, onClose }) =
     }
   };
 
+  const saveToDatabase = async (data: FormData) => {
+    try {
+      const response = await fetch('/.netlify/functions/db-test', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: data.name,
+          email: data.email,
+          profession: data.profession,
+          age: data.age,
+          prayerFrequency: data.prayerFrequency,
+          arabicUnderstanding: data.arabicUnderstanding,
+          difficultyUnderstanding: data.difficultyUnderstanding,
+          importanceOfUnderstanding: data.importanceOfUnderstanding,
+          biggestStruggle: data.biggestStruggle,
+          arInterest: data.arInterest,
+          valuableFeatures: data.valuableFeatures,
+          barriers: data.barriers,
+          paymentWillingness: data.paymentWillingness,
+          budgetRange: data.budgetRange,
+          likelihood: data.likelihood,
+          additionalFeedback: data.additionalFeedback,
+          interviewWillingness: data.interviewWillingness,
+          investorPresentationInterest: data.investorPresentationInterest
+        }),
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        return { success: true, data: result };
+      } else {
+        const error = await response.json();
+        return { success: false, error: error.details || 'Database save failed' };
+      }
+    } catch (error) {
+      console.error('Error saving to database:', error);
+      return { success: false, error: 'Network error' };
+    }
+  };
+
   const handleFinalSubmit = async () => {
     setIsSubmitting(true);
     setEmailStatus('sending');
     
     try {
-      // Prepare data for database
-      const dbData: WaitlistEntry = {
-        name: formData.name,
-        email: formData.email,
-        profession: formData.profession,
-        age: formData.age,
-        prayer_frequency: formData.prayerFrequency,
-        arabic_understanding: formData.arabicUnderstanding,
-        difficulty_understanding: formData.difficultyUnderstanding,
-        importance_of_understanding: formData.importanceOfUnderstanding,
-        biggest_struggle: formData.biggestStruggle,
-        ar_interest: formData.arInterest,
-        valuable_features: formData.valuableFeatures,
-        barriers: formData.barriers,
-        payment_willingness: formData.paymentWillingness,
-        budget_range: formData.budgetRange,
-        likelihood: formData.likelihood,
-        additional_feedback: formData.additionalFeedback,
-        interview_willingness: formData.interviewWillingness,
-        investor_presentation_interest: formData.investorPresentationInterest
-      };
-
-      // Save to Neon database
-      const dbResult = await saveWaitlistEntry(dbData);
+      // Save to Neon database via API
+      const dbResult = await saveToDatabase(formData);
       
       if (!dbResult.success) {
         console.error('Database save failed:', dbResult.error);
-        if (dbResult.code === 'DUPLICATE_EMAIL') {
-          setEmailStatus('error');
-          alert('❌ This email is already on our waitlist!');
-          setIsSubmitting(false);
-          return;
-        } else {
-          // Continue with email even if database fails
-          console.warn('Database save failed but continuing with email...');
-        }
+        // Continue with email even if database fails
+        console.warn('Database save failed but continuing with email...');
       } else {
         console.log('✅ Successfully saved to Neon database:', dbResult.data);
       }

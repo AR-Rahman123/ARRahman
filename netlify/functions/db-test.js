@@ -8,13 +8,40 @@ export async function handler(event, context) {
   const data = JSON.parse(event.body);
 
   const client = new Client({
-    connectionString: process.env.DATABASE_URL,
+    connectionString: process.env.POSTGRES_URL,
     ssl: { rejectUnauthorized: false },
   });
 
   try {
     await client.connect();
 
+    // Create table if it doesn't exist
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS waitlist (
+        id SERIAL PRIMARY KEY,
+        name VARCHAR(255) NOT NULL,
+        email VARCHAR(255) NOT NULL UNIQUE,
+        profession VARCHAR(255),
+        age VARCHAR(50),
+        prayer_frequency VARCHAR(100),
+        arabic_understanding VARCHAR(100),
+        difficulty_understanding VARCHAR(100),
+        importance_of_understanding VARCHAR(100),
+        biggest_struggle VARCHAR(255),
+        ar_interest VARCHAR(100),
+        valuable_features TEXT[],
+        barriers TEXT[],
+        payment_willingness VARCHAR(100),
+        budget_range VARCHAR(100),
+        likelihood VARCHAR(100),
+        additional_feedback TEXT,
+        interview_willingness VARCHAR(100),
+        investor_presentation_interest VARCHAR(100),
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+
+    // Insert the data
     await client.query(
       `INSERT INTO waitlist
       (name, email, profession, age, prayer_frequency, arabic_understanding, difficulty_understanding,
