@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Test - Database Time</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .loading {
+            color: #666;
+            font-style: italic;
+        }
+        .error {
+            color: #e74c3c;
+            background-color: #fdf2f2;
+            padding: 15px;
+            border-radius: 5px;
+            border-left: 4px solid #e74c3c;
+        }
+        .success {
+            color: #27ae60;
+            background-color: #f2fdf5;
+            padding: 15px;
+            border-radius: 5px;
+            border-left: 4px solid #27ae60;
+        }
+        .api-info {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        .api-info code {
+            background-color: #e9ecef;
+            padding: 2px 4px;
+            border-radius: 3px;
+            font-family: monospace;
+        }
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 20px;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        button:disabled {
+            background-color: #bdc3c7;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="api-info">
+            <h3>API Endpoint Information</h3>
+            <p><strong>URL:</strong> <code id="api-url">https://your-netlify-site.netlify.app/.netlify/functions/db-test</code></p>
+            <p><strong>Expected Response:</strong> <code>{ "time": "2025-07-02T16:01:23.456Z" }</code></p>
+        </div>
+
+        <h1 id="result" class="loading">Loading database time...</h1>
+        
+        <button id="refresh-btn" onclick="fetchDatabaseTime()">Refresh Time</button>
+        
+        <div id="status"></div>
+    </div>
+
+    <script>
+        // Backend API endpoint URL
+        const API_ENDPOINT = 'https://your-netlify-site.netlify.app/.netlify/functions/db-test';
+
+        async function fetchDatabaseTime() {
+            const resultElement = document.getElementById('result');
+            const statusElement = document.getElementById('status');
+            const refreshButton = document.getElementById('refresh-btn');
+            
+            // Show loading state
+            resultElement.textContent = 'Loading database time...';
+            resultElement.className = 'loading';
+            statusElement.innerHTML = '';
+            refreshButton.disabled = true;
+
+            try {
+                console.log('Fetching data from:', API_ENDPOINT);
+                
+                const response = await fetch(API_ENDPOINT);
+                
+                console.log('Response status:', response.status);
+                console.log('Response headers:', response.headers);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                console.log('Response data:', data);
+
+                if (data.time) {
+                    // Format the time for better display
+                    const timeString = new Date(data.time).toLocaleString();
+                    resultElement.textContent = `Database Time: ${timeString}`;
+                    resultElement.className = '';
+                    
+                    statusElement.innerHTML = `
+                        <div class="success">
+                            ✅ Successfully fetched data from API<br>
+                            <small>Raw response: ${JSON.stringify(data)}</small>
+                        </div>
+                    `;
+                } else {
+                    throw new Error('No time field in response');
+                }
+
+            } catch (error) {
+                console.error('Error fetching data:', error);
+                
+                resultElement.textContent = 'Error fetching data';
+                resultElement.className = '';
+                
+                statusElement.innerHTML = `
+                    <div class="error">
+                        ❌ Failed to fetch data<br>
+                        <strong>Error:</strong> ${error.message}<br>
+                        <small>Check the browser console for more details</small>
+                    </div>
+                `;
+            } finally {
+                refreshButton.disabled = false;
+            }
+        }
+
+        // Call the function when page loads
+        document.addEventListener('DOMContentLoaded', fetchDatabaseTime);
+
+        // Update the displayed API URL
+        document.getElementById('api-url').textContent = API_ENDPOINT;
+    </script>
+</body>
+</html>
