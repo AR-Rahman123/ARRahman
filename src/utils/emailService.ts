@@ -2,10 +2,10 @@ import emailjs from '@emailjs/browser';
 
 // EmailJS configuration - Replace these with your actual values
 const EMAILJS_CONFIG = {
-  serviceId: "service_xjizkqm", // Replace with your EmailJS service ID
-  templateId: "template_4alhysb", // Replace with your EmailJS template ID
-  confirmationTemplateId: "template_confirmation_id", // Replace with your confirmation template ID
-  publicKey: "ye3twwVcfp0jM_o2z", // Replace with your EmailJS public key
+  serviceId: "service_xjizkqm",
+  templateId: "template_4alhysb", 
+  confirmationTemplateId: "template_f4hrejv", // ← Replace this
+  publicKey: "ye3twwVcfp0jM_o2z",
 };
 
 export interface WaitlistData {
