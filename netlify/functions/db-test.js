@@ -43,6 +43,39 @@ export async function handler(event, context) {
         data.investorPresentationInterest
       ]
     );
+async function submitWaitlist(e) {
+  e.preventDefault();
+
+  const formData = {
+    name: document.getElementById('name').value,
+    email: document.getElementById('email').value,
+    profession: document.getElementById('profession').value,
+    age: document.getElementById('age').value,
+    prayerFrequency: document.getElementById('prayerFrequency').value,
+    arabicUnderstanding: document.getElementById('arabicUnderstanding').value,
+    difficultyUnderstanding: document.getElementById('difficultyUnderstanding').value,
+    importanceOfUnderstanding: document.getElementById('importanceOfUnderstanding').value,
+    biggestStruggle: document.getElementById('biggestStruggle').value,
+    arInterest: document.getElementById('arInterest').value,
+    valuableFeatures: Array.from(document.querySelectorAll('input[name="valuableFeatures"]:checked')).map(el => el.value),
+    barriers: Array.from(document.querySelectorAll('input[name="barriers"]:checked')).map(el => el.value),
+    paymentWillingness: document.getElementById('paymentWillingness').value,
+    budgetRange: document.getElementById('budgetRange').value,
+    likelihood: document.getElementById('likelihood').value,
+    additionalFeedback: document.getElementById('additionalFeedback').value,
+    interviewWillingness: document.getElementById('interviewWillingness').value,
+    investorPresentationInterest: document.getElementById('investorPresentationInterest').value
+  };
+
+  const response = await fetch('https://your-netlify-site.netlify.app/.netlify/functions/db-test', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(formData)
+  });
+
+  const result = await response.json();
+  console.log(result);
+}
 
     await client.end();
 
