@@ -1,11 +1,7 @@
 import React, { useState } from 'react';
 import { X, Mail, User, Briefcase, CheckCircle, ChevronRight, ChevronLeft } from 'lucide-react';
 import { sendWaitlistNotification, sendConfirmationEmail, WaitlistData } from '../utils/emailService';
-import { createClient } from '@supabase/supabase-js';
-const supabaseUrl = 'https://fpbmozjmwcwwrgjrxeib.supabase.co';
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZwYm1vemptd2N3d3JnanJ4ZWliIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTEzMDk2MzQsImV4cCI6MjA2Njg4NTYzNH0.WCNW3F5xDfZ-BD_pU4JoPJGc4jkRtwhgFkxdpTzre-c';
-
-const supabase = createClient(supabaseUrl, supabaseKey);
+import { saveWaitlistEntry, WaitlistEntry } from '../utils/database';
 
 
 interface WaitlistFormProps {
@@ -159,55 +155,6 @@ const questions = [
 export const WaitlistForm: React.FC<WaitlistFormProps> = ({ isOpen, onClose }) => {
   const [currentStep, setCurrentStep] = useState(1);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
-
-  setIsSubmitting(true);
-  setEmailStatus('sending');
-
-  // Insert only the relevant fields you want to save in Supabase
-  const { error } = await supabase
-    .from('waitlist')
-    .insert([{
-      name: formData.name,
-      email: formData.email,
-      message: formData.message,
-      profession: formData.profession,
-      // add more fields here if you want to store them
-    }]);
-
-  setIsSubmitting(false);
-
-  if (error) {
-    setEmailStatus('error');
-    alert('❌ Error saving: ' + error.message);
-  } else {
-    setEmailStatus('success');
-    alert('✅ Successfully joined the waitlist!');
-    // Optionally reset your formData here:
-    setFormData({
-      name: '',
-      email: '',
-      profession: '',
-      age: '',
-      prayerFrequency: '',
-      arabicUnderstanding: '',
-      difficultyUnderstanding: '',
-      importanceOfUnderstanding: '',
-      biggestStruggle: '',
-      arInterest: '',
-      valuableFeatures: [],
-      barriers: [],
-      paymentWillingness: '',
-      budgetRange: '',
-      likelihood: '',
-      additionalFeedback: '',
-      interviewWillingness: '',
-      investorPresentationInterest: ''
-    });
-    setCurrentStep(1);
-  }
-};
   const [formData, setFormData] = useState<FormData>({
     name: '',
     email: '',
@@ -301,6 +248,46 @@ export const WaitlistForm: React.FC<WaitlistFormProps> = ({ isOpen, onClose }) =
     setEmailStatus('sending');
     
     try {
+      // Prepare data for database
+      const dbData: WaitlistEntry = {
+        name: formData.name,
+        email: formData.email,
+        profession: formData.profession,
+        age: formData.age,
+        prayer_frequency: formData.prayerFrequency,
+        arabic_understanding: formData.arabicUnderstanding,
+        difficulty_understanding: formData.difficultyUnderstanding,
+        importance_of_understanding: formData.importanceOfUnderstanding,
+        biggest_struggle: formData.biggestStruggle,
+        ar_interest: formData.arInterest,
+        valuable_features: formData.valuableFeatures,
+        barriers: formData.barriers,
+        payment_willingness: formData.paymentWillingness,
+        budget_range: formData.budgetRange,
+        likelihood: formData.likelihood,
+        additional_feedback: formData.additionalFeedback,
+        interview_willingness: formData.interviewWillingness,
+        investor_presentation_interest: formData.investorPresentationInterest
+      };
+
+      // Save to Neon database
+      const dbResult = await saveWaitlistEntry(dbData);
+      
+      if (!dbResult.success) {
+        console.error('Database save failed:', dbResult.error);
+        if (dbResult.code === 'DUPLICATE_EMAIL') {
+          setEmailStatus('error');
+          alert('❌ This email is already on our waitlist!');
+          setIsSubmitting(false);
+          return;
+        } else {
+          // Continue with email even if database fails
+          console.warn('Database save failed but continuing with email...');
+        }
+      } else {
+        console.log('✅ Successfully saved to Neon database:', dbResult.data);
+      }
+
       // Prepare data for EmailJS
       const waitlistData: WaitlistData = {
         name: formData.name,
@@ -329,7 +316,7 @@ export const WaitlistForm: React.FC<WaitlistFormProps> = ({ isOpen, onClose }) =
       // Send confirmation email to user
       const confirmationSent = await sendConfirmationEmail(formData.email, formData.name);
 
-      if (notificationSent) {
+      if (notificationSent || dbResult.success) {
         setEmailStatus('success');
         setCurrentStep(3);
       } else {
