@@ -20,7 +20,6 @@ interface FormData {
   arInterest: string;
   valuableFeatures: string[];
   barriers: string[];
-  budgetRange: string;
   likelihood: string;
   additionalFeedback: string;
   interviewWillingness: string;
@@ -110,12 +109,6 @@ const questions = [
     ]
   },
   {
-    id: 'budgetRange',
-    title: 'When it comes to your budget for an Augmented Reality Qur\'an service, which price do you have in mind?',
-    type: 'radio',
-    options: ['Under $100', '$100-$300', '$300-$500', '$500-$1000', '$1000-$2000', 'Over $2000']
-  },
-  {
     id: 'likelihood',
     title: '(Optional) If this product were available in the next 12 months, how likely would you be to try it?',
     type: 'radio',
@@ -159,7 +152,6 @@ export const WaitlistForm: React.FC<WaitlistFormProps> = ({ isOpen, onClose }) =
     arInterest: '',
     valuableFeatures: [],
     barriers: [],
-    budgetRange: '',
     likelihood: '',
     additionalFeedback: '',
     interviewWillingness: '',
@@ -253,7 +245,6 @@ export const WaitlistForm: React.FC<WaitlistFormProps> = ({ isOpen, onClose }) =
           arInterest: data.arInterest,
           valuableFeatures: data.valuableFeatures,
           barriers: data.barriers,
-          budgetRange: data.budgetRange,
           likelihood: data.likelihood,
           additionalFeedback: data.additionalFeedback,
           interviewWillingness: data.interviewWillingness,
@@ -304,7 +295,6 @@ export const WaitlistForm: React.FC<WaitlistFormProps> = ({ isOpen, onClose }) =
         arInterest: formData.arInterest,
         valuableFeatures: formData.valuableFeatures,
         barriers: formData.barriers,
-        budgetRange: formData.budgetRange,
         likelihood: formData.likelihood,
         additionalFeedback: formData.additionalFeedback,
         interviewWillingness: formData.interviewWillingness,
@@ -361,7 +351,7 @@ export const WaitlistForm: React.FC<WaitlistFormProps> = ({ isOpen, onClose }) =
       name: '', email: '', profession: '', age: '', prayerFrequency: '',
       arabicUnderstanding: '', difficultyUnderstanding: '', importanceOfUnderstanding: '',
       biggestStruggle: '', arInterest: '', valuableFeatures: [], barriers: [],
-      budgetRange: '', likelihood: '', additionalFeedback: '',
+      likelihood: '', additionalFeedback: '',
       interviewWillingness: '', investorPresentationInterest: ''
     });
     setCurrentStep(1);

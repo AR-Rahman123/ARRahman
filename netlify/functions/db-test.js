@@ -15,7 +15,7 @@ export async function handler(event, context) {
   try {
     await client.connect();
 
-    // Create table if it doesn't exist (updated schema without payment_willingness)
+    // Create table if it doesn't exist (updated schema without budget_range)
     await client.query(`
       CREATE TABLE IF NOT EXISTS waitlist (
         id SERIAL PRIMARY KEY,
@@ -31,7 +31,6 @@ export async function handler(event, context) {
         ar_interest VARCHAR(100),
         valuable_features TEXT[],
         barriers TEXT[],
-        budget_range VARCHAR(100),
         likelihood VARCHAR(100),
         additional_feedback TEXT,
         interview_willingness VARCHAR(100),
@@ -40,14 +39,14 @@ export async function handler(event, context) {
       )
     `);
 
-    // Insert the data (removed payment_willingness field)
+    // Insert the data (removed budget_range field)
     await client.query(
       `INSERT INTO waitlist
       (name, email, profession, age, prayer_frequency, arabic_understanding, difficulty_understanding,
        importance_of_understanding, biggest_struggle, ar_interest, valuable_features, barriers,
-       budget_range, likelihood, additional_feedback, interview_willingness,
+       likelihood, additional_feedback, interview_willingness,
        investor_presentation_interest)
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)`,
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)`,
       [
         data.name,
         data.email,
@@ -61,7 +60,6 @@ export async function handler(event, context) {
         data.arInterest,
         data.valuableFeatures, // array
         data.barriers,         // array
-        data.budgetRange,
         data.likelihood,
         data.additionalFeedback,
         data.interviewWillingness,
